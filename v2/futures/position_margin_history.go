@@ -88,3 +88,87 @@ type PositionMarginHistory struct {
 	Type         int    `json:"type"`
 	PositionSide string `json:"positionSide"`
 }
+
+// Do send request for OneWay account
+func (s *GetPositionMarginHistoryService) DoOneWay(ctx context.Context, opts ...RequestOption) (res []*PositionMarginHistoryExtended, err error) {
+	r := &request{
+		method:   http.MethodGet,
+		endpoint: "/fapi/v1/positionMargin/history",
+		secType:  secTypeSigned,
+	}
+	r.setParam("symbol", s.symbol)
+	if s._type != nil {
+		r.setParam("type", *s._type)
+	}
+	if s.startTime != nil {
+		r.setParam("startTime", *s.startTime)
+	}
+	if s.endTime != nil {
+		r.setParam("endTime", *s.endTime)
+	}
+	if s.limit != nil {
+		r.setParam("limit", *s.limit)
+	}
+
+	data, _, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = make([]*PositionMarginHistoryExtended, 0)
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+type PositionMarginHistoryExtended struct {
+	EntryPrice       string `json:"entryPrice"`
+	MarginType       string `json:"marginType"`
+	IsAutoAddMargin  string `json:"isAutoAddMargin"`
+	IsolatedMargin   string `json:"isolatedMargin"`
+	Leverage         string `json:"leverage"`
+	LiquidationPrice string `json:"liquidationPrice"`
+	MarkPrice        string `json:"markPrice"`
+	MaxNotionalValue string `json:"maxNotionalValue"`
+	PositionAmt      string `json:"positionAmt"`
+	Notional         string `json:"notional"`
+	IsolatedWallet   string `json:"isolatedWallet"`
+	Symbol           string `json:"symbol"`
+	UnRealizedProfit string `json:"unRealizedProfit"`
+	PositionSide     string `json:"positionSide"`
+	UpdateTime       string `json:"updateTime"`
+}
+
+// Do send request for Hedge account
+func (s *GetPositionMarginHistoryService) DoHedge(ctx context.Context, opts ...RequestOption) (res [][]*PositionMarginHistoryExtended, err error) {
+	r := &request{
+		method:   http.MethodGet,
+		endpoint: "/fapi/v1/positionMargin/history",
+		secType:  secTypeSigned,
+	}
+	r.setParam("symbol", s.symbol)
+	if s._type != nil {
+		r.setParam("type", *s._type)
+	}
+	if s.startTime != nil {
+		r.setParam("startTime", *s.startTime)
+	}
+	if s.endTime != nil {
+		r.setParam("endTime", *s.endTime)
+	}
+	if s.limit != nil {
+		r.setParam("limit", *s.limit)
+	}
+
+	data, _, err := s.c.callAPI(ctx, r, opts...)
+	if err != nil {
+		return nil, err
+	}
+	res = make([][]*PositionMarginHistoryExtended, 0)
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
